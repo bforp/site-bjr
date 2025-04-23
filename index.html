@@ -1,65 +1,132 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>BJR MED Distribuidora</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-</head>
-<body>
-    <header>
-        <h1>BJR MED DISTRIBUIDORA LTDA</h1>
-        <p>Distribuindo saúde com confiança.</p>
-    </header>
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Menu, X } from "lucide-react";
 
-    <nav>
-        <a href="#sobre">Sobre</a>
-        <a href="#produtos">Produtos</a>
-        <a href="#contato">Contato</a>
-    </nav>
+/**
+ * Site de anúncios de frete
+ * Layout flat, simples e moderno usando Tailwind + shadcn/ui
+ * Component único em React para facilitar deploy no Vite, Next.js ou CRA.
+ */
+export default function FreteSite() {
+  const [open, setOpen] = useState(false);
+  const toggleMenu = () => setOpen(!open);
 
-    <section id="sobre">
-        <h2>Sobre Nós</h2>
-        <p>Somos uma distribuidora especializada em materiais médicos e odontológicos.</p>
-    </section>
+  // anúncios salvos em localStorage para persistir entre recarregamentos
+  const [ads, setAds] = useState(() => {
+    if (typeof window === "undefined") return [];
+    const stored = localStorage.getItem("frete_ads");
+    return stored ? JSON.parse(stored) : [];
+  });
 
-    <section id="produtos">
-        <h2>Produtos</h2>
-        <div class="galeria">
-            <div class="produto">
-                <img src="https://via.placeholder.com/200x150" alt="Luvas descartáveis">
-                <h3>Luvas descartáveis</h3>
-                <p>Alta resistência, látex ou nitrílica.</p>
-            </div>
-            <div class="produto">
-                <img src="https://via.placeholder.com/200x150" alt="Máscaras cirúrgicas">
-                <h3>Máscaras cirúrgicas</h3>
-                <p>Três camadas, proteção e conforto.</p>
-            </div>
-            <div class="produto">
-                <img src="https://via.placeholder.com/200x150" alt="Instrumentos odontológicos">
-                <h3>Instrumentos odontológicos</h3>
-                <p>Qualidade e precisão para consultórios.</p>
-            </div>
+  useEffect(() => {
+    localStorage.setItem("frete_ads", JSON.stringify(ads));
+  }, [ads]);
+
+  // estado do formulário
+  const [form, setForm] = useState({
+    nome: "",
+    telefone: "",
+    cidade: "",
+    veiculo: "",
+    descricao: "",
+  });
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const publishAd = () => {
+    if (!form.nome || !form.telefone || !form.cidade || !form.veiculo) return alert("Preencha todos os campos obrigatórios");
+    setAds([{ ...form, id: Date.now() }, ...ads]);
+    setForm({ nome: "", telefone: "", cidade: "", veiculo: "", descricao: "" });
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
+      {/* NAVBAR */}
+      <nav className="bg-white shadow fixed w-full z-10">
+        <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+          <a href="#home" className="text-2xl font-bold">Frete<span className="text-blue-600">Já</span></a>
+          <button className="md:hidden" onClick={toggleMenu}>{open ? <X /> : <Menu />}</button>
+          <ul className="hidden md:flex space-x-8 text-sm font-medium">
+            <li><a href="#home" className="hover:text-blue-600">Início</a></li>
+            <li><a href="#anunciar" className="hover:text-blue-600">Anunciar</a></li>
+            <li><a href="#veiculos" className="hover:text-blue-600">Veículos</a></li>
+            <li><a href="#contato" className="hover:text-blue-600">Contato</a></li>
+          </ul>
         </div>
-    </section>
+        {/* mobile menu */}
+        {open && (
+          <ul className="md:hidden bg-white border-t px-4 pb-4 space-y-2 text-sm font-medium">
+            <li><a href="#home" onClick={toggleMenu}>Início</a></li>
+            <li><a href="#anunciar" onClick={toggleMenu}>Anunciar</a></li>
+            <li><a href="#veiculos" onClick={toggleMenu}>Veículos</a></li>
+            <li><a href="#contato" onClick={toggleMenu}>Contato</a></li>
+          </ul>
+        )}
+      </nav>
 
-    <section id="contato">
-        <h2>Contato</h2>
-        <p>Envie uma mensagem por aqui:</p>
-        <form action="https://formsubmit.co/seu-email@email.com" method="POST">
-            <input type="text" name="nome" placeholder="Seu nome" required>
-            <input type="email" name="email" placeholder="Seu e-mail" required>
-            <textarea name="mensagem" placeholder="Sua mensagem" rows="5" required></textarea>
-            <button type="submit">Enviar</button>
-        </form>
-        <p>Ou se preferir: <a href="https://wa.me/5587999999999" target="_blank">Chamar no WhatsApp</a></p>
-    </section>
+      {/* HERO */}
+      <section id="home" className="pt-24 pb-16 text-center bg-gradient-to-b from-blue-50 to-slate-50">
+        <div className="max-w-3xl mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Encontre ou anuncie fretes <span className="text-blue-600">sem complicação</span></h1>
+          <p className="text-lg mb-8 text-slate-600">Um marketplace simples para conectar motoristas e clientes em todo o Brasil.</p>
+          <a href="#anunciar"><Button size="lg">Quero Anunciar</Button></a>
+        </div>
+      </section>
 
-    <footer>
-        <p>&copy; 2025 BJR MED DISTRIBUIDORA LTDA</p>
-    </footer>
+      {/* FORMULÁRIO DE ANÚNCIO */}
+      <section id="anunciar" className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-start">
+          <div>
+            <h2 className="text-3xl font-semibold mb-4">Cadastre seu veículo</h2>
+            <p className="text-slate-600 mb-6">Preencha os campos abaixo para disponibilizar seu serviço de frete.</p>
+          </div>
+          <Card>
+            <CardContent className="space-y-4 pt-6">
+              <Input placeholder="Nome do motorista" name="nome" value={form.nome} onChange={handleChange} />
+              <Input placeholder="Telefone para contato" name="telefone" value={form.telefone} onChange={handleChange} />
+              <Input placeholder="Cidade/Região" name="cidade" value={form.cidade} onChange={handleChange} />
+              <Input placeholder="Tipo de veículo" name="veiculo" value={form.veiculo} onChange={handleChange} />
+              <Textarea placeholder="Descrição (capacidade, disponibilidade, etc.)" name="descricao" value={form.descricao} onChange={handleChange} />
+              <Button className="w-full" onClick={publishAd}>Publicar</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-    <script src="script.js"></script>
-</body>
-</html>
+      {/* LISTA DE VEÍCULOS */}
+      <section id="veiculos" className="py-16 bg-slate-100">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-semibold text-center mb-10">Veículos Disponíveis</h2>
+          {ads.length === 0 ? (
+            <p className="text-center text-slate-600">Nenhum anúncio ainda. Seja o primeiro a publicar!</p>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ads.map((ad) => (
+                <Card key={ad.id} className="hover:shadow-lg transition">
+                  <CardContent className="p-6 space-y-2">
+                    <p className="font-bold text-lg">{ad.nome}</p>
+                    <p className="text-sm">{ad.telefone}</p>
+                    <p className="text-sm">{ad.cidade} - {ad.veiculo}</p>
+                    {ad.descricao && <p className="text-slate-600 text-sm mt-2">{ad.descricao}</p>}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* CONTATO */}
+      <section id="contato" className="py-16 bg-white">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-semibold mb-4">Precisa de ajuda?</h2>
+          <p className="text-slate-600 mb-6">Fale conosco pelo e‑mail <a className="text-blue-600 underline" href="mailto:suporte@freteja.com">suporte@freteja.com</a></p>
+          <p className="text-xs text-slate-400">© {new Date().getFullYear()} FreteJá. Todos os direitos reservados.</p>
+        </div>
+      </section>
+    </div>
+  );
+}
